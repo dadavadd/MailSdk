@@ -20,24 +20,16 @@ public class SdkAuthorization : IAsyncDisposable
             Headless = false
         });
 
-        using (_playwright)
-        {
-            await using (_browserContext)
-            {
-                var page = _browserContext.Pages[0];
-                await page.GotoAsync("https://otvet.mail.ru");
-                page.Request += OnRequest;
+        var page = _browserContext.Pages[0];
+        await page.GotoAsync("https://otvet.mail.ru");
+        page.Request += OnRequest;
 
-                while (_account is null)
-                    await Task.Delay(100);
+        while (_account is null)
+            await Task.Delay(100);
 
-                page.Request -= OnRequest;
+        page.Request -= OnRequest;
 
-                await _browserContext.CloseAsync();
-
-                return _account!;
-            }
-        }
+        return _account!;
     }
 
     private async void OnRequest(object? sender, IRequest request)
